@@ -30,6 +30,8 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
+  final GlobalKey<ScaffoldState> _scaffoldKey =  GlobalKey<ScaffoldState>();
+
   @override
   Widget build(BuildContext context) {
     return BlocListener<LoginCubit, LoginState>(
@@ -37,9 +39,12 @@ class _LoginScreenState extends State<LoginScreen> {
         if(state is LoginSuccessState){
           sl<GraphqlService>().init();
           Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const HomeScreen(),), (route) => false,);
+        }if(state is LoginErrorState){
+          // _scaffoldKey.currentState.s
         }
       },
       child: Scaffold(
+        key: _scaffoldKey ,
         body: Center(
           child: ListView(
             shrinkWrap: true,
@@ -61,6 +66,12 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               BlocBuilder<LoginCubit, LoginState>(
                 builder: (context, state) {
+                  if(state is LoginLoadingState){
+                    return SizedBox(
+                        height: AppHeight.h50,
+                        width:AppHeight.h50,
+                        child: FittedBox(child: const CircularProgressIndicator()));
+                  }
                   return DefaultAppButton(
                     iconData: Icons.lock,
                     textButton: AppStrings.login,
